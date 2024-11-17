@@ -1,166 +1,257 @@
+Recipe API with Authentication and Authorization
+A RESTful API for managing recipes with authentication and authorization. This app supports user registration and login with JWT-based authentication and includes role-based access control (RBAC) to manage permissions for different user roles (e.g., Admin and User).
 
-Recipe App RESTful API
-This is a Recipe App RESTful API built using Node.js, Express, and MongoDB. The API allows users to manage recipes with features such as creating, updating, retrieving, and deleting recipes, as well as paginating through a list of items.
+Table of Contents
+Features
+Tech Stack
+Installation
+API Endpoints
+Authentication
+Authorization
+Items
+Middleware
+Environment Variables
+Testing
 
 Features
-CRUD operations: Create, Read, Update, and Delete recipes.
-Pagination: Support for paginated responses to efficiently handle large datasets.
-Validation: Input validation for required fields, data types, and custom rules (e.g., positive quantity for items).
-Error Handling: Graceful error handling with detailed error messages.
-Table of Contents
+User Authentication:
+
+JWT-based Authentication: Issue a JSON Web Token (JWT) to authenticated users, stored securely (e.g., in local storage for the browser).
+Session-based Authentication: (Optional): You can choose between using JWT or session-based authentication by storing a session ID in cookies/local storage.
+Authorization:
+
+Role-based Access Control (RBAC):
+Admins can create, update, and delete recipes.
+Regular users (non-admins) can only view recipes (GET endpoints).
+Permissions are checked before allowing users to perform actions.
+CRUD Operations:
+
+Create, Read, Update, and Delete recipes (items).
+Pagination and Sorting for item listings.
+Tech Stack
+Node.js: JavaScript runtime for the server.
+Express.js: Web framework to build RESTful APIs.
+MongoDB: NoSQL database to store users and recipes.
+Mongoose: MongoDB object modeling for Node.js.
+JWT (JSON Web Token): Used for token-based authentication.
+bcrypt: Used to hash user passwords securely.
+dotenv: For managing environment variables.
+express-validator: For validating incoming request data.
+Installation
 Prerequisites
-Installation
-Environment Variables
-API Endpoints
-Testing with Postman
-
-Before you can run this application, you will need to have the following installed on your system:
-
-Node.js (version 14.x or higher)
-MongoDB (or use a cloud-based service like MongoDB Atlas)
-Postman (for testing API endpoints)
-You can download Node.js from the official website.
-
-Installation
+Node.js and npm installed.
+MongoDB (local or cloud instance) to store data.
+Steps to Install
 Clone the repository:
 
-bash
-Copy code
-git clone https://github.com/nkoebotse/recipe-api.git
+
+git clone https://github.com/yourusername/recipe-api.git
 cd recipe-api
 Install dependencies:
 
-Install the required Node.js packages using npm:
-
 
 npm install
-Set up MongoDB:
+Set up environment variables: Create a .env file in the root directory and add the following environment variables:
 
-Ensure you have MongoDB running locally or set up an account on MongoDB Atlas for a cloud-based database.
+env
 
-Create a .env file:
-
-Create a .env file at the root of the project to configure your environment variables.
-
-Example .env file:
-
-
-MONGO_URI=MONGO_URI=mongodb+srv://elliotsekgobela:LeVmntGWuzbKBEdo@cluster0.y30ux.mongodb.net/
+MONGO_URI=mongodb://your-mongo-db-uri-here
+JWT_SECRET=your-secret-key-here
 PORT=8001
 Run the server:
 
-Start the server using nodemon for hot-reloading:
 
 
-nodemon server.js
-Your server will start and be accessible at http://localhost:8001.
+npm run dev
+The server will start on port 8001.
 
-Environment Variables
-This application requires the following environment variables to run:
-
-The following endpoints are available in the Recipe App API:
-
-1. POST /api/v1/items
-Create a new recipe item.
-
-Request Body (JSON):
-
-json
-Copy code
-{
-  "name": "Spaghetti",
-  "quantity": 2,
-  "notes": "Dinner",
-  "category": "Pasta",
-  "tags": ["pap", "easy"]
-}
-Response:
-
-Status: 201 Created
-Body: Newly created recipe item.
-2. GET /api/v1/items
-Retrieve a list of all items (with pagination).
-
-Query Parameters:
-
-page: The page number (default: 1).
-limit: The number of items per page (default: 5).
-sortBy: Field to sort by (default: createdAt).
-order: Sort order (asc or desc, default: asc).
-Response:
-
-Status: 200 OK
-Body: List of items with pagination details.
-3. GET /api/v1/items/
-Retrieve a single recipe item by its ID.
-
-Response:
-
-Status: 200 OK
-Body: The recipe item with the specified ID.
-4. PUT /api/v1/items/
-Update a recipe item by its ID.
-
-Request Body (JSON):
-
-
-{
-  "name": "Spaghetti Bolognese",
-  "quantity": 3,
-  "notes": "Dinner with sauce",
-  "category": "Pasta",
-  "tags": ["italian", "dinner"]
-}
-Response:
-
-Status: 200 OK
-Body: The updated recipe item.
-5. DELETE /api/v1/items/
-Delete a recipe item by its ID.
-
-Response:
-
-Status: 200 OK
-Body: Success message indicating the item was deleted.
-Testing with Postman
-You can test the API using Postman by sending requests to the endpoints mentioned above. Below are some examples of how to use Postman to test the API.
-
-Example 1: Create a new item (POST /items)
+API Endpoints
+Authentication
+Register User
+URL: /api/v1/user
 Method: POST
-URL: http://localhost:8001/api/v1/items
-Body (JSON):
+Body:
 json
 Copy code
 {
-  "name": "Spaghetti",
-  "quantity": 2,
-  "notes": "Dinner",
-  "category": "Pasta",
-  "tags": ["italian", "easy"]
+  "email": "user@example.com",
+  "password": "Password123!"
 }
-Example 2: Get all items (GET /items)
-Method: GET
-URL: http://localhost:8001/api/v1/items?page=1&limit=5
-Example 3: Get an item by ID (GET /items/
-)
-Method: GET
-URL: http://localhost:8001/api/v1/items/60b8d1d461a4bc1f78d8d1d1
-Example 4: Update an item (PUT /items/
-)
-Method: PUT
-URL: http://localhost:8001/api/v1/items/60b8d1d461a4bc1f78d8d1d1
-Body (JSON):
+Response:
+json
+Copy code
+{
+  "_id": "user_id",
+  "email": "user@example.com"
+}
+Description: Registers a new user with a hashed password.
+Login User
+URL: /api/v1/user/login
+Method: POST
+Body:
+json
+Copy code
+{
+  "email": "user@example.com",
+  "password": "Password123!"
+}
+Response:
+json
+Copy code
+{
+  "_id": "user_id",
+  "email": "user@example.com",
+  "token": "jwt_token_here"
+}
+Description: Authenticates a user and returns a JWT token for subsequent requests.
+Authorization (Role-Based Access Control)
+Role-based Permissions
+Admin users can:
+Create, update, and delete items (recipes).
+Regular users (non-admin) can:
+Only read (GET) items.
+Cannot create, update, or delete items.
+The JWT token carries the user information, including their role. Based on the role, the user will be permitted to perform certain actions.
+
+Items (Recipes)
+Create Item (Admin Only)
+URL: /api/v1/items
+Method: POST
+Headers:
+Authorization: Bearer <jwt_token>
+Body:
 json
 Copy code
 {
   "name": "Spaghetti Bolognese",
-  "quantity": 3,
-  "notes": "Dinner with sauce",
-  "category": "Pasta",
-  "tags": ["italian", "dinner"]
+  "quantity": 1,
+  "category": "Main Course",
+  "tags": ["pasta", "beef"],
+  "notes": "A delicious Italian dish."
 }
-Example 5: Delete an item (DELETE /items/
-)
+Response:
+json
+Copy code
+{
+  "_id": "item_id",
+  "name": "Spaghetti Bolognese",
+  "quantity": 1,
+  "category": "Main Course",
+  "tags": ["pasta", "beef"],
+  "notes": "A delicious Italian dish.",
+  "createdAt": "2024-11-17T12:34:56.789Z"
+}
+Get All Items
+URL: /api/v1/items
+
+Method: GET
+
+Headers:
+
+Authorization: Bearer <jwt_token>
+Query Params (Optional):
+
+page: Page number for pagination (default is 1).
+limit: Number of items per page (default is 5).
+sortBy: Field to sort by (default is createdAt).
+order: Sort order, asc or desc (default is asc).
+Response:
+
+json
+
+{
+  "items": [
+    {
+      "_id": "item_id",
+      "name": "Spaghetti Bolognese",
+      "quantity": 1,
+      "category": "Main Course",
+      "tags": ["pasta", "beef"],
+      "notes": "A delicious Italian dish.",
+      "createdAt": "2024-11-17T12:34:56.789Z"
+    }
+  ],
+  "totalItems": 1,
+  "page": 1,
+  "limit": 5
+}
+Get Item by ID
+URL: /api/v1/items/:id
+Method: GET
+Headers:
+Authorization: Bearer <jwt_token>
+Response:
+json
+
+{
+  "_id": "item_id",
+  "name": "Spaghetti Bolognese",
+  "quantity": 1,
+  "category": "Main Course",
+  "tags": ["pasta", "beef"],
+  "notes": "A delicious Italian dish.",
+  "createdAt": "2024-11-17T12:34:56.789Z"
+}
+Update Item (Admin Only)
+URL: /api/v1/items/:id
+Method: PUT
+Headers:
+Authorization: Bearer <jwt_token>
+Body:
+json
+
+{
+  "name": "Updated Recipe Name",
+  "quantity": 2,
+  "category": "Updated Category",
+  "tags": ["updated", "tags"],
+  "notes": "Updated notes."
+}
+Response:
+json
+
+{
+  "_id": "item_id",
+  "name": "Updated Recipe Name",
+  "quantity": 2,
+  "category": "Updated Category",
+  "tags": ["updated", "tags"],
+  "notes": "Updated notes.",
+  "createdAt": "2024-11-17T12:34:56.789Z"
+}
+Delete Item (Admin Only)
+URL: /api/v1/items/:id
 Method: DELETE
-URL: http://localhost:8001/api/v1/items/60b8d1d461a4bc1f78d8d1d1
-# Codetribe2024_recipe-api
+Headers:
+Authorization: Bearer <jwt_token>
+Response:
+json
+
+{
+  "message": "Item deleted successfully"
+}
+Middleware
+Protect Middleware: Ensures the user is authenticated by verifying the JWT token.
+If the token is valid, it will attach the user object to the request (req.user).
+If the token is missing or invalid, it returns a 401 Unauthorized error.
+Role-based Access Control (RBAC):
+Admin-only routes: Certain actions (like creating, updating, or deleting items) are restricted to Admin users only.
+Regular users: Can only access read-only routes (e.g., GET items).
+Environment Variables
+Make sure you set up the following environment variables in the .env file:
+
+env
+
+MONGO_URI=mongodb://your-mongo-db-uri-here
+JWT_SECRET=your-secret-key-here
+PORT=8001
+Testing
+You can test the API using Postman or cURL. The following actions can be tested:
+
+Register a User
+Login and Get JWT Token
+Create an Item (Admin Only)
+Get All Items
+Get Item by ID
+Update and Delete Item (Admin Only)
+Ensure that you include the JWT token in the Authorization header for protected routes# Codetribe2024_RecipeAPIwithAuthentication-Authorization
