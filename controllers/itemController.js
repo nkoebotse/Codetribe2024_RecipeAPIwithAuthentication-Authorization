@@ -44,7 +44,6 @@ const getItems = async (req, res) => {
         res.status(500).json({ error: "An error occurred while fetching items" });
     }
 };
-
 // Get a single item by ID
 const getItem = async (req, res) => {
     try {
